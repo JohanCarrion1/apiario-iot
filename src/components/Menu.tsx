@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Download,
   Info,
+  LogOut,
   Menu as MenuIcon,
   Pause,
   Play,
@@ -14,9 +15,16 @@ interface MenuProps {
   onTogglePause: () => void
   onExportApiary: () => void
   onGoToThresholds: () => void
+  onLogout: () => void
 }
 
-export default function Menu({ paused, onTogglePause, onExportApiary, onGoToThresholds }: MenuProps) {
+export default function Menu({
+  paused,
+  onTogglePause,
+  onExportApiary,
+  onGoToThresholds,
+  onLogout,
+}: MenuProps) {
   const [open, setOpen] = useState(false)
   const [about, setAbout] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -83,13 +91,15 @@ export default function Menu({ paused, onTogglePause, onExportApiary, onGoToThre
         aria-expanded={open}
         className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-700/60 bg-stone-800/60 text-stone-300 transition-colors hover:bg-stone-700 hover:text-stone-100"
       >
-        {open ? <X className="h-4.5 w-4.5" /> : <MenuIcon className="h-4.5 w-4.5" />}
+        {open ? <X className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
       </button>
 
       {open && (
         <div className="fade-up absolute right-0 top-11 z-50 w-64 overflow-hidden rounded-xl border border-stone-700/80 bg-stone-900/95 shadow-2xl shadow-black/50 backdrop-blur-md">
           <div className="border-b border-stone-800/60 px-4 py-2.5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Opciones</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">
+              Opciones
+            </p>
           </div>
           <ul>
             {items.map((item) => (
@@ -106,9 +116,21 @@ export default function Menu({ paused, onTogglePause, onExportApiary, onGoToThre
                 </button>
               </li>
             ))}
+            <li className="border-t border-stone-800/60">
+              <button
+                onClick={() => {
+                  setOpen(false)
+                  onLogout()
+                }}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-red-500/10"
+              >
+                <LogOut className="h-4 w-4 shrink-0 text-red-400" />
+                <span className="text-sm font-medium text-red-400">Cerrar sesión</span>
+              </button>
+            </li>
           </ul>
           <div className="border-t border-stone-800/60 px-4 py-2">
-            <p className="text-[11px] text-stone-500">Apiario IoT · v0.4</p>
+            <p className="text-[11px] text-stone-500">Apiario IoT · v0.5</p>
           </div>
         </div>
       )}
@@ -132,7 +154,7 @@ export default function Menu({ paused, onTogglePause, onExportApiary, onGoToThre
               </div>
               <div>
                 <h3 className="font-bold">Apiario IoT</h3>
-                <p className="text-xs text-stone-400">v0.4 · Datos simulados</p>
+                <p className="text-xs text-stone-400">v0.5 · Datos simulados</p>
               </div>
             </div>
             <p className="mb-4 text-sm leading-relaxed text-stone-300">

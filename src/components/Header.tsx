@@ -5,20 +5,24 @@ interface HeaderProps {
   apiaryName: string
   location: string
   hiveCount: number
+  userName: string
   paused: boolean
   onTogglePause: () => void
   onExportApiary: () => void
   onGoToThresholds: () => void
+  onLogout: () => void
 }
 
 export default function Header({
   apiaryName,
   location,
   hiveCount,
+  userName,
   paused,
   onTogglePause,
   onExportApiary,
   onGoToThresholds,
+  onLogout,
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-stone-800/60 bg-stone-950/80 backdrop-blur-md">
@@ -29,7 +33,10 @@ export default function Header({
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">
-              Apiario<span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent"> IoT</span>
+              Apiario
+              <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                {' '}IoT
+              </span>
             </h1>
             <p className="text-xs text-stone-400">Monitoreo de colmenas en tiempo real</p>
           </div>
@@ -60,11 +67,18 @@ export default function Header({
               <Radio className="h-3 w-3" /> {hiveCount} estaciones
             </p>
           </div>
+          <div className="hidden items-center gap-2 rounded-full border border-stone-700/60 bg-stone-800/60 px-3 py-1.5 lg:flex">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-[11px] font-bold text-stone-950">
+              {userName.slice(0, 1).toUpperCase()}
+            </span>
+            <span className="text-xs font-medium text-stone-200">{userName}</span>
+          </div>
           <Menu
             paused={paused}
             onTogglePause={onTogglePause}
             onExportApiary={onExportApiary}
             onGoToThresholds={onGoToThresholds}
+            onLogout={onLogout}
           />
         </div>
       </div>
