@@ -1,33 +1,23 @@
 import { useEffect, useState } from 'react'
 import type { Apiary } from '../types'
-import { createInitialApiaries, nextReading } from '../data/mockApiaries'
+import type { SensorService } from '../services/SensorService'
+import { MockSensorService } from '../services/MockSensorService'
 
 const TICK_MS = 3000
 
 /**
- * Simula estaciones IoT enviando lecturas cada TICK_MS.
- * Para conectar sensores reales, reemplaza el interval por un
- * fetch/polling a tu backend manteniendo la misma forma de estado.
+ * Suscribe la UI a la fuente de sensores. Cambia la implementación de
+ * SensorService para conectar un backend real sin tocar componentes.
  */
-export function useSensorData(): Apiary[] {
-  const [apiaries, setApiaries] = useState<Apiary[]>(() => createInitialApiaries())
+export function useSensorData(service: SensorService = new MockSensorService()): Apiary[] {
+  const [apiaries, setApiaries] = useState<Apiary[]>(() => service.getInitialApiaries())
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setApiaries((prev) =>
-        prev.map((apiary) => ({
-          ...apiary,
-          hives: apiary.hives.map((hive) => {
-            const history = [...hive.history, nextReading(hive.history[hive.history.length - 1])]
-            if (history.length > 40) history.shift()
-            const battery = Math.max(0, hive.battery - (Math.random() < 0.08 ? 1 : 0))
-            return { ...hive, battery, history }
-          }),
-        })),
-      )
+      setApiaries((prev) => service.tick(prev))
     }, TICK_MS)
     return () => clearInterval(timer)
-  }, [])
+  }, [service])
 
   return apiaries
 }

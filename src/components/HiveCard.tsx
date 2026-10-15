@@ -1,24 +1,19 @@
 import type { Hive } from '../types'
+import type { Thresholds } from '../lib/thresholds'
+import { evaluateHive } from '../lib/alerts'
 
 interface HiveCardProps {
   hive: Hive
   selected: boolean
+  thresholds: Thresholds
   onSelect: () => void
 }
 
-function hasAlert(hive: Hive): boolean {
+export default function HiveCard({ hive, selected, thresholds, onSelect }: HiveCardProps) {
   const last = hive.history[hive.history.length - 1]
-  return (
-    last.temperature < 10 ||
-    last.temperature > 38 ||
-    last.humidity > 80 ||
-    hive.battery < 20
-  )
-}
+  const alerts = evaluateHive(hive, '', thresholds)
+  const danger = alerts.some((a) => a.level === 'danger')
 
-export default function HiveCard({ hive, selected, onSelect }: HiveCardProps) {
-  const last = hive.history[hive.history.length - 1]
-  const alert = hasAlert(hive)
   return (
     <button
       onClick={onSelect}
@@ -34,10 +29,14 @@ export default function HiveCard({ hive, selected, onSelect }: HiveCardProps) {
         <span
           className={
             'rounded-full px-2 py-0.5 text-xs font-semibold ' +
-            (alert ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400')
+            (danger
+              ? 'bg-red-500/20 text-red-400'
+              : alerts.length > 0
+                ? 'bg-amber-500/20 text-amber-400'
+                : 'bg-emerald-500/20 text-emerald-400')
           }
         >
-          {alert ? '⚠ Alerta' : '● OK'}
+          {danger ? '⚠ Crítico' : alerts.length > 0 ? '⚠ Alerta' : '● OK'}
         </span>
       </div>
       <dl className="grid grid-cols-3 gap-2 text-sm">
@@ -58,7 +57,9 @@ export default function HiveCard({ hive, selected, onSelect }: HiveCardProps) {
         <span>🔋 Batería {hive.battery}%</span>
         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-700">
           <div
-            className={hive.battery < 20 ? 'h-full bg-red-500' : 'h-full bg-emerald-500'}
+            className={
+              hive.battery < thresholds.batteryMin ? 'h-full bg-red-500' : 'h-full bg-emerald-500'
+            }
             style={{ width: hive.battery + '%' }}
           />
         </div>
