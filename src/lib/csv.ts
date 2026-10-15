@@ -1,14 +1,16 @@
 import type { Hive } from '../types'
 
+const LF = String.fromCharCode(10)
+
 function csvEscape(value: string | number): string {
   const s = String(value)
-  return /[",
-]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s
+  return s.includes(',') || s.includes('"') || s.includes(LF)
+    ? '"' + s.replace(/"/g, '""') + '"'
+    : s
 }
 
 export function toCsv(rows: Array<Array<string | number>>): string {
-  return rows.map((row) => row.map(csvEscape).join(',')).join('
-')
+  return rows.map((row) => row.map(csvEscape).join(',')).join(LF)
 }
 
 export function readingsToCsv(hive: Hive): string {
@@ -16,7 +18,13 @@ export function readingsToCsv(hive: Hive): string {
     ['timestamp_iso', 'timestamp_ms', 'temperature_c', 'humidity_pct', 'weight_kg'],
   ]
   for (const r of hive.history) {
-    rows.push([new Date(r.ts).toISOString(), r.ts, r.temperature.toFixed(2), r.humidity.toFixed(1), r.weight.toFixed(2)])
+    rows.push([
+      new Date(r.ts).toISOString(),
+      r.ts,
+      r.temperature.toFixed(2),
+      r.humidity.toFixed(1),
+      r.weight.toFixed(2),
+    ])
   }
   return toCsv(rows)
 }

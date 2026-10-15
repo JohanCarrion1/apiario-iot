@@ -4,8 +4,7 @@ import type { Hive } from '../types'
 
 describe('toCsv', () => {
   it('escapa comas y comillas correctamente', () => {
-    expect(toCsv([['a', 'b,c'], ['d"e', 1]])).toBe('a,"b,c"
-"d""e",1')
+    expect(toCsv([['a', 'b,c'], ['d"e', 1]])).toBe('a,"b,c"' + String.fromCharCode(10) + '"d""e",1')
   })
 })
 
@@ -21,8 +20,7 @@ describe('readingsToCsv', () => {
       ],
     }
     const csv = readingsToCsv(hive)
-    const lines = csv.split('
-')
+    const lines = csv.split(String.fromCharCode(10))
     expect(lines[0]).toBe('timestamp_iso,timestamp_ms,temperature_c,humidity_pct,weight_kg')
     expect(lines).toHaveLength(3)
     expect(lines[1]).toContain('34.50')
